@@ -145,6 +145,20 @@ def draw_skeleton(
             cv2.circle(frame, (int(x), int(y)), 4,
                        (0, 255, 0), -1, cv2.LINE_AA)   
 
+def enhance_frame_with_clahe(frame: np.ndarray) -> np.ndarray:
+    """
+    Pre-processing step with CLAHE (Constrast Limited Adaptive Histogram
+    Equalization) to improve constrast in frames.
+    """
+    frame_lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(frame_lab)
+
+    clahe = cv2.createCLAHE(clipLimit=6.0, tileGridSize=(8, 8))
+    l_enhanced = clahe.apply(l)
+
+    enhanced = cv2.merge([l_enhanced, a, b])
+    return cv2.cvtColor(enhanced, cv2.COLOR_LAB2RGB)
+
 def run(args):
     """
     Iterate over all image sequences in 'args.data_dir', run pose estimation
@@ -235,9 +249,9 @@ def run(args):
                     warnings.warn(
                         f"Could not read {frame_path}, skipping.")
                     continue
-                
-                # Preprocess: BGR -> RGB, resize, pad, normalise to [0, 1]
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                # Preprocess: CLAHE, LAB -> RGB, resize, pad, normalise to [0, 1]
+                frame_rgb = enhance_frame_with_clahe(frame)
                 frame_resized = cv2.resize(
                     frame_rgb, (resized_width, resized_height))
                 frame_padded = cv2.copyMakeBorder(
