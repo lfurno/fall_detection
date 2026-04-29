@@ -43,6 +43,14 @@ from pathlib import Path
 import cv2
 import onnxruntime as ort
 
+
+# Flag to enable debug mode.
+# When False, all keypoints are drawn in green lime.
+# When True, keypoints are drawn in different colors to identify
+# them more easily. Please, see below the KEYPOINT_NAMES and
+# COLORS lists for the mapping.
+DEBUG = False
+
 # Skeleton definition (COCO 17-keypoint layout used by YOLO-Pose)
 KEYPOINT_NAMES = [
     "nose",             # 0
@@ -64,7 +72,28 @@ KEYPOINT_NAMES = [
     "right_ankle",      # 16
 ]
 
-# Pairs of keypoint indices that should be connected by a line.
+# BGR colors - useful to identify each keypoint
+COLORS = [
+    (255, 255, 255),        # white - nose
+    (255, 255, 0),          # cyan - left_eye
+    (23, 45, 136),          # sienna - right_eye
+    (204, 102, 153),        # amethyst - left_ear
+    (128, 0, 0),            # blue navy - right_ear
+    (107, 168, 0),          # green - left_shoulder
+    (0, 0, 255),            # red - right_shoulder
+    (128, 128, 0),          # teal - left_elbow
+    (124, 200, 255),        # topaz - right_elbow
+    (55, 78, 111),          # brown - left_wrist
+    (128, 0, 128),          # purple - right_wrist
+    (255, 127, 0),          # azure - left_hip
+    (24, 117, 255),         # orange - right_hip
+    (0, 215, 255),          # yellow - left_knee
+    (238, 130, 238),        # violet - right_knee
+    (255, 0, 255),          # magenta - left_ankle
+    (0, 255, 0),            # lime - right_ankle
+]
+
+# Pairs of keypoint indices that should be connected by a line
 EDGES = [
     (0, 1), (0, 2), (1, 3), (2, 4),            # head connections
     (0, 5), (0, 6), (5, 6),                    # shoulders
@@ -115,7 +144,7 @@ def unpad_keypoints(
 def draw_skeleton(
         frame: np.ndarray,
         keypoints: list[float],
-        threshold: float = 0.3
+        threshold: float = 0.3,
         ) -> None:
     """
     Draw the skeleton (edges and joint dots) onto 'frame' in-place.
@@ -140,10 +169,14 @@ def draw_skeleton(
             cv2.line(frame, (int(x1), int(y1)), (int(x2), int(y2)),
                      (0, 0, 0), 2, cv2.LINE_AA)
      
-    for _, (x, y, score) in enumerate(keypoints):   
+    for ind, (x, y, score) in enumerate(keypoints):
         if score > threshold:
+            if DEBUG:
+                color = COLORS[ind]
+            else:
+                color = (0, 255, 0)
             cv2.circle(frame, (int(x), int(y)), 4,
-                       (0, 255, 0), -1, cv2.LINE_AA)   
+                       color, -1, cv2.LINE_AA)
 
 def enhance_frame_with_clahe(frame: np.ndarray) -> np.ndarray:
     """
@@ -287,7 +320,7 @@ def run(args):
                 keypoints = unpad_keypoints(
                     keypoints_norm, scale, pad_left, pad_top, 
                     height, width)
-                              
+
                 draw_skeleton(frame, keypoints, args.threshold)
                 writer.write(frame)                
         
