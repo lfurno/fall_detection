@@ -5,6 +5,7 @@ This project explores fall detection using a **YOLO pose** model exported to ONN
 This is a work in progress, following the roadmap below
 
 - [x] Run a YOLO pose model and validate it.
+- [ ] Train a baseline fall detector using existing UR Fall depth features
 - [ ] Features Extraction using YOLO pose output
 - [ ] Fall classifier 
 - [ ] Evaluation metrics
@@ -14,7 +15,7 @@ This is a work in progress, following the roadmap below
 ## Installation
 
 ```bash
-pip install ultralytics onnxruntime opencv-python numpy tqdm
+pip install ultralytics onnxruntime opencv-python numpy tqdm pandas seaborn matplotlib scikit-learn
 # For GPU inference:
 pip install onnxruntime-gpu
 ```
@@ -83,4 +84,18 @@ python process_dataset_with_YOLO-Pose.py \
         --output_dir path/to/output \
         --threshold  thr \ # Minimum keypoint confidence to render
         [--cuda]  # Enable CUDA execution provider 
+```
+
+# Baseline - Fall detector using existing depth features
+
+As a baseline for future comparison, this repository includes a fall detector trained on existing depth-camera features provided with the UR Fall dataset.
+
+This baseline is **not** the final feature classifier of the project. The main goal of the project is to extract features from YOLO-Pose outputs and train a classifier on those features later.
+
+The current baseline only detects whether a person is in a **lying** or **not lying** posture. It does not classify complete fall events. As next step, a temporal window will be used to detect the "falling" state.
+
+```bash
+python src/training/fall_detection_depth/posture_detector_with_depth_features.py \
+    --data_dir path/to/features_from_depth_camera \
+    --output_dir path/to/output
 ```
