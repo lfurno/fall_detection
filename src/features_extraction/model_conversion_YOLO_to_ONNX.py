@@ -18,10 +18,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Convert a YOLO-Pose .pt model to ONNX format.")
     parser.add_argument("--model_path",
-                        default='../share/models/YOLO/yolo26n-pose.pt',
+                        default='../../share/models/YOLO/yolo26n-pose.pt',
                         help = "Path to the YOLO-Pose .pt model to convert.")
     parser.add_argument("--output_dir",
-                        default="../share/models/YOLO/",
+                        default="../../share/models/YOLO/",
                         help = "Directory where the exported ONNX model will be written.")
     args = parser.parse_args()
 

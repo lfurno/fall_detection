@@ -331,11 +331,11 @@ if __name__ == "__main__":
         description="Yolo-Pose ONNX inference over image-sequence datasets.")
     parser.add_argument(
         "--model_path",
-        default='../share/models/YOLO/yolo26n-pose.onnx',
+        default='../../share/models/YOLO/yolo26n-pose.onnx',
         help = "Path to the ONNX pose-estimation model.")
     parser.add_argument(
         "--data_dir",
-        default='../share/frames',
+        default='../../share/frames',
         help = "Root directory containing class/sequence/frame sub-folders.")
     parser.add_argument(
         "--output_dir",
