@@ -152,6 +152,31 @@ The plots include:
 - recall and specificity across decision thresholds;
 - aggregate OOF and held-out test confusion matrices.
 
+#### Results
+
+The temporal CNN was evaluated on **held-out recording sequences**, separate from those used for training and cross-validation. All reported metrics are calculated at the **window level**.
+
+- **Development set:** 56 sequences, producing 477 windows (62 positive; 415 negative).
+- **Held-out test set:** 14 sequences, producing 132 windows (16 positive; 116 negative).
+- **Model selection:** 4-fold stratified group cross-validation on the development sequences.
+- **Decision threshold:** 0.4854, selected from pooled out-of-fold predictions.
+
+| Metric | Development (out-of-fold) | Held-out test |
+| --- | ---: | ---: |
+| Accuracy | 0.9832 | 0.9773 |
+| Precision | 0.8971 | 0.9333 |
+| Recall | 0.9839 | 0.8750 |
+| F1-score | 0.9385 | 0.9032 |
+| Specificity | 0.9831 | 0.9914 |
+| AUROC | 0.9966 | 0.9537 |
+| Average precision | 0.9753 | 0.9301 |
+
+On the held-out test set, the model correctly classified **14 of 16 positive windows** and **115 of 116 negative windows** (2 false negatives; 1 false positive).
+
+The dataset used in this experiment is relatively small, comprising **70 recording sequences and 609 overlapping windows**, including **78 positive windows**. Since windows from the same sequence are correlated, the results should be considered preliminary and validated on a larger, more diverse dataset. **Window-level recall is not an event-level fall detection rate.**
+
+The trained temporal model was exported to ONNX for subsequent inference and integration work.
+
 ### Validate the exported model
 
 Compare the complete PyTorch and ONNX inference paths on the same raw window:
